@@ -1,7 +1,6 @@
-#!/usr/bin/env mocha -R spec
-
 import {strict as assert} from "node:assert";
-import {sed} from "../lib/sed-lite.js";
+import {describe, it} from "node:test";
+import {sed} from "../lib/sed-lite.ts";
 
 const TITLE = "escape.test.ts";
 
