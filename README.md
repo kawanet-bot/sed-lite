@@ -1,6 +1,6 @@
 # sed-lite
 
-`sed` compiler for JavaScript
+Compile `sed`-style substitution definitions into JavaScript replacer functions.
 
 [![npm](https://img.shields.io/npm/v/sed-lite.svg)](https://www.npmjs.com/package/sed-lite)
 [![Node.js CI](https://github.com/kawanet/sed-lite/workflows/Node.js%20CI/badge.svg?branch=master)](https://github.com/kawanet/sed-lite/actions/)
@@ -28,12 +28,12 @@ See TypeScript declaration
 [sed-lite.d.ts](https://github.com/kawanet/sed-lite/blob/master/types/sed-lite.d.ts)
 for more detail.
 
-## LINKS
+## SEE ALSO
 
 - https://github.com/kawanet/sed-lite
-- https://www.npmjs.com/package/browserify-sed
-- https://www.npmjs.com/package/express-sed
 - https://www.npmjs.com/package/sed-lite
+- https://www.npmjs.com/package/express-sed
+- https://www.npmjs.com/package/browserify-sed
 
 ## LICENSE
 
