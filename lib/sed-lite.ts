@@ -5,9 +5,15 @@ import type * as types from "../types/sed-lite";
 type Replacer = (str: string) => string;
 
 /**
- * @param {string} str "s/match/replace/flag"
- * @returns {Function} (str => str.replace(/match/flag, "replace")
- * @throws {SyntaxError}
+ * Compile a `sed`-style substitution definition into a JavaScript
+ * replacer function. The returned function performs the substitution
+ * with `String.prototype.replace`. Multiple substitutions chained with
+ * `;` are applied in left-to-right order; lines beginning with `#` are
+ * treated as comments.
+ *
+ * @param str Substitution definition in the form `"s/match/replace/flags"`.
+ * @returns A function that applies the parsed substitution(s) to its input.
+ * @throws SyntaxError if `str` is not a valid `sed` expression.
  */
 
 export const sed: typeof types.sed = str => {

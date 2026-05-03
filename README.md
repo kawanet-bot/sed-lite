@@ -1,10 +1,10 @@
 # sed-lite
 
-`sed` compiler for JavaScript
+Compile `sed`-style substitution definitions into JavaScript replacer functions.
 
 [![npm](https://img.shields.io/npm/v/sed-lite.svg)](https://www.npmjs.com/package/sed-lite)
 [![Node.js CI](https://github.com/kawanet/sed-lite/workflows/Node.js%20CI/badge.svg?branch=master)](https://github.com/kawanet/sed-lite/actions/)
-[![minified size](https://img.shields.io/bundlephobia/min/sed-lite)](https://cdn.jsdelivr.net/npm/sed-lite/dist/sed-lite.min.js)
+[![gzip size](https://img.badgesize.io/https://cdn.jsdelivr.net/npm/sed-lite/dist/sed-lite.min.js?compression=gzip)](https://cdn.jsdelivr.net/npm/sed-lite/dist/sed-lite.min.js)
 
 ## SYNOPSIS
 
@@ -28,18 +28,18 @@ See TypeScript declaration
 [sed-lite.d.ts](https://github.com/kawanet/sed-lite/blob/master/types/sed-lite.d.ts)
 for more detail.
 
-## LINKS
+## SEE ALSO
 
 - https://github.com/kawanet/sed-lite
-- https://www.npmjs.com/package/browserify-sed
-- https://www.npmjs.com/package/express-sed
 - https://www.npmjs.com/package/sed-lite
+- https://www.npmjs.com/package/express-sed
+- https://www.npmjs.com/package/browserify-sed
 
 ## LICENSE
 
 The MIT License (MIT)
 
-Copyright (c) 2020-2024 Yusuke Kawasaki
+Copyright (c) 2020-2026 Yusuke Kawasaki
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

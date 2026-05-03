@@ -1,6 +1,6 @@
 #!/usr/bin/env mocha -R spec
 
-import {strict as assert} from "assert";
+import {strict as assert} from "node:assert";
 import {sed} from "../lib/sed-lite.js";
 
 const TITLE = "error.test.ts";
