@@ -71,27 +71,31 @@ $(PKG_DST):
 # results in process.argv = ['node', 'arg1', 'arg2'].
 smoke: smoke-mjs smoke-cjs smoke-minjs
 
+# MJS smoke test via public entrypoint.
 smoke-mjs: all
-	@# MJS smoke test via public entrypoint
 	cd .. && node --input-type=module -e 'const m = await import("sed-lite"); for (const k of process.argv.slice(1)) { if (typeof m[k] !== "function") { console.error("missing MJS export:", k); process.exit(1); } console.log("MJS export OK:", k); }' $(NAMED_EXPORTS)
 
+# CJS smoke test via public entrypoint.
 smoke-cjs: all
-	@# CJS smoke test via public entrypoint
 	cd .. && node --input-type=commonjs -e 'const m = require("sed-lite"); for (const k of process.argv.slice(1)) { if (typeof m[k] !== "function") { console.error("missing CJS export:", k); process.exit(1); } console.log("CJS export OK:", k); }' $(NAMED_EXPORTS)
 
+# Minified browser bundle smoke covers two consumer paths:
+#
+# (1) Browser shape: pipe the IIFE bundle plus a verification tail into
+#     `node -`, then look up each named export via direct eval(k). The
+#     bundle's top-level `var sed = ...` is in scope for eval(). argv
+#     layout is [node, '-', name1, name2, ...] when stdin is the script,
+#     hence slice(2) (asymmetric with smoke-mjs / smoke-cjs which use
+#     slice(1)).
+#
+# (2) CJS shape: require() the same .min.js file. The bundle's footer
+#     assigns `exports.sed = sed`, so consumers can pull the named
+#     export the same way they would from dist/sed-lite.cjs. Verifies
+#     the dist/package.json `{"type":"commonjs"}` override also takes
+#     effect (Node would otherwise treat .js under a `type: module`
+#     parent as ESM and fail).
 smoke-minjs: $(MINJS_DST) $(PKG_DST)
-	@# (1) Browser shape: pipe the IIFE bundle plus a verification tail
-	@# into `node -`, then look up each named export via direct eval(k).
-	@# The bundle's top-level `var` declarations are in scope for eval().
-	@# argv layout is [node, '-', name1, name2, ...] when stdin is the
-	@# script, hence slice(2) (asymmetric with smoke-mjs/cjs's slice(1)).
 	(cat $< && echo '; for (const k of process.argv.slice(2)) { if (typeof eval(k) !== "function") { console.error("missing browser export:", k); process.exit(1); } console.log("browser export OK:", k); }') | node - $(NAMED_EXPORTS)
-	@# (2) CJS shape: require() the same .min.js file. The bundle's
-	@# footer assigns `exports.sed = sed`, so consumers can pull the
-	@# named export the same way they would from dist/sed-lite.cjs.
-	@# Verifies the dist/package.json `{"type":"commonjs"}` override
-	@# also takes effect (Node would otherwise treat .js under a
-	@# `type: module` parent as ESM and fail).
 	cd .. && node --input-type=commonjs -e 'const m = require("./dist/sed-lite.min.js"); for (const k of process.argv.slice(1)) { if (typeof m[k] !== "function") { console.error("missing minjs CJS export:", k); process.exit(1); } console.log("minjs CJS export OK:", k); }' $(NAMED_EXPORTS)
 
 ####
