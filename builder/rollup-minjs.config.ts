@@ -28,7 +28,15 @@ const rollupConfig: RollupOptions = {
         // IIFE assigns its return value to the outer `var sed`.
         // Rollup's `outro` would be inside the IIFE, where `sed` does
         // not yet exist.
-        footer: "if (typeof module !== 'undefined') { module.exports = sed }",
+        //
+        // Setting `exports.sed = sed` mirrors the named-export shape
+        // of dist/sed-lite.cjs so the two files are interchangeable
+        // under `require(...)`. The pre-modernization wrapper used
+        // the same approach (it passed an `exports` object to the
+        // IIFE and the body did `exports.sed = sed`). The gate is on
+        // `typeof exports` for consistency with the body that writes
+        // to `exports`.
+        footer: "if (typeof exports !== 'undefined') { exports.sed = sed; }",
     },
 
     plugins: [
