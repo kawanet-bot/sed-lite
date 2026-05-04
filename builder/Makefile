@@ -5,15 +5,18 @@ SHELL := bash
 SRC   := $(wildcard ../lib/*.ts)
 TYPES := $(wildcard ../types/*.d.ts)
 BUILDER_SRC := $(wildcard ./*.ts)
+TEST_SRC := $(wildcard ../test/*.ts)
 
 MJS_DST   := ../dist/sed-lite.mjs
 CJS_DST   := ../dist/sed-lite.cjs
 MINJS_DST := ../dist/sed-lite.min.js
 PKG_DST   := ../dist/package.json
+TEST_DST  := ../test/test.browser.js
 
 MJS_CONFIG   := ./rollup-mjs.config.ts
 CJS_CONFIG   := ./rollup-cjs.config.ts
 MINJS_CONFIG := ./rollup-minjs.config.ts
+TEST_CONFIG  := ./rollup-test.config.ts
 
 # Bundle is small: this package is a single source file with no production
 # dependencies. Node builtins are external for cjs/mjs; the browser bundle
@@ -22,10 +25,15 @@ MINJS_CONFIG := ./rollup-minjs.config.ts
 # dep — fail the build so it cannot slip in.
 MAX_BYTES := 5000
 
+# The browser test bundle inlines the test sources, the sed-lite source,
+# and the small node:test / node:assert shims. ~5 KB today, capped well
+# above for headroom as more tests are added.
+TEST_MAX_BYTES := 50000
+
 # Documented named exports that must be verified in every bundle.
 NAMED_EXPORTS := sed
 
-ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(PKG_DST)
+ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(PKG_DST) $(TEST_DST)
 
 ####
 
@@ -62,6 +70,18 @@ $(MINJS_DST): $(MINJS_CONFIG) $(SRC) $(BUILDER_SRC)
 $(PKG_DST):
 	@mkdir -p $(dir $@)
 	echo '{"type":"commonjs"}' > $@
+	@ls -l $@
+	@echo ""
+
+# Browser test bundle. Inlines the test sources, the sed-lite source
+# they import, and the small node:test / node:assert shims (aliased
+# in via rollup-test.config.ts). Loaded by `test/test.html` so the
+# same node:test sources can run unchanged in a browser without
+# mocha or chai.
+$(TEST_DST): $(TEST_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC)
+	@mkdir -p $(dir $@)
+	../node_modules/.bin/rollup -c $<
+	@test "$$(wc -c < $@)" -le $(TEST_MAX_BYTES) || { echo "ERROR: $@ exceeds $(TEST_MAX_BYTES) byte cap" >&2; exit 1; }
 	@ls -l $@
 	@echo ""
 
