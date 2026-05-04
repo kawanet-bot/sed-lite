@@ -1,6 +1,10 @@
 // sed-lite.ts
 
-import type * as types from "../types/sed-lite";
+// Self-reference via the package name so `tsc --noEmit` resolves these
+// types through `package.json` `exports` — the same path an external
+// consumer would take. If the `exports.types` mapping ever breaks,
+// the build fails here.
+import type * as types from "sed-lite";
 
 type Replacer = (str: string) => string;
 

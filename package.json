@@ -1,7 +1,7 @@
 {
   "name": "sed-lite",
   "description": "`sed` compiler for JavaScript",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "author": "Yusuke Kawasaki <u-suke@kawa.net>",
   "bugs": {
     "url": "https://github.com/kawanet/sed-lite/issues"
@@ -10,30 +10,42 @@
     "Yusuke Kawasaki <u-suke@kawa.net>"
   ],
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^28.0.1",
-    "@rollup/plugin-multi-entry": "^6.0.1",
-    "@rollup/plugin-node-resolve": "^15.3.0",
-    "@types/mocha": "10.0.10",
-    "@types/node": "22.10.2",
-    "assert": "^1.5.1",
-    "mocha": "11.0.1",
-    "rollup": "^4.28.1",
-    "terser": "5.37.0",
-    "typescript": "5.7.2"
+    "@rollup/plugin-node-resolve": "^16.0.2",
+    "@rollup/plugin-sucrase": "^5.0.2",
+    "@rollup/plugin-terser": "^1.0.0",
+    "@types/node": "^24.0.0",
+    "rollup": "^4.52.4",
+    "terser": "^5.44.0",
+    "typescript": "^5.9.3"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=22",
+      "onFail": "warn"
+    }
+  },
+  "engines": {
+    "node": ">=20"
   },
   "exports": {
-    "types": "./types/sed-lite.d.ts",
-    "import": "./esm/sed-lite.mjs",
-    "require": "./lib/sed-lite.js"
+    ".": {
+      "types": "./types/sed-lite.d.ts",
+      "require": "./dist/sed-lite.cjs",
+      "import": "./dist/sed-lite.mjs"
+    }
   },
   "files": [
     "LICENSE",
     "README.md",
     "browser/import.js",
+    "browser/package.json",
+    "dist/package.json",
+    "dist/sed-lite.cjs",
     "dist/sed-lite.min.js",
-    "esm/sed-lite.mjs",
-    "lib/sed-lite.js",
-    "types/sed-lite.d.ts"
+    "dist/sed-lite.mjs",
+    "lib/*.ts",
+    "types/*.d.ts"
   ],
   "homepage": "https://github.com/kawanet/sed-lite#readme",
   "keywords": [
@@ -41,17 +53,19 @@
     "sed"
   ],
   "license": "MIT",
-  "main": "lib/sed-lite.js",
+  "main": "./dist/sed-lite.cjs",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kawanet/sed-lite.git"
   },
   "scripts": {
-    "build": "make",
+    "build": "make -C builder",
     "fixpack": "fixpack",
-    "prepack": "npm run build && npm run test",
-    "test": "make test"
+    "prepack": "if node -v | grep -q '^v20'; then echo 'ERROR: packing is not allowed on Node 20'; exit 1; fi",
+    "prepare": "if node -v | grep -q '^v20'; then :; else make -C builder clean all test; fi",
+    "test": "make -C builder test"
   },
-  "type": "commonjs",
-  "typings": "./types/sed-lite.d.ts"
+  "sideEffects": false,
+  "type": "module",
+  "types": "./types/sed-lite.d.ts"
 }
