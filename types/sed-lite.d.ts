@@ -8,11 +8,8 @@
  * @param def Substitution definition in the form `"s/match/replace/flags"`.
  *            Multiple substitutions can be chained with `;` and lines
  *            beginning with `#` are treated as comments.
- * @returns A function that applies the parsed substitution(s) to its input,
- *          or `undefined` when `def` is empty (or contains only whitespace,
- *          `;`, and `#` comment lines, which collapse to nothing after
- *          stripping).
- * @throws SyntaxError if `def` is non-empty but not a valid `sed` expression.
+ * @returns A function that applies the parsed substitution(s) to its input.
+ * @throws SyntaxError if `def` is not a valid `sed` expression.
  *
  * @example
  *   const fn = sed("s/foo/FOO/g");

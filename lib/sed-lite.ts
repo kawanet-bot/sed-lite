@@ -16,11 +16,8 @@ type Replacer = (str: string) => string;
  * treated as comments.
  *
  * @param str Substitution definition in the form `"s/match/replace/flags"`.
- * @returns A function that applies the parsed substitution(s) to its input,
- *          or `undefined` when `str` is empty (or contains only whitespace,
- *          `;`, and `#` comment lines, which collapse to nothing after
- *          stripping).
- * @throws SyntaxError if `str` is non-empty but not a valid `sed` expression.
+ * @returns A function that applies the parsed substitution(s) to its input.
+ * @throws SyntaxError if `str` is not a valid `sed` expression.
  */
 
 export const sed: typeof types.sed = str => {
@@ -32,7 +29,7 @@ export const sed: typeof types.sed = str => {
     str = str.replace(/^(\s+|;|#[^\r\n]*([\r\n]+|$))*/g, "");
 
     // empty
-    if (!str) return undefined;
+    if (!str) return;
 
     const delim = str[1] || "/";
     const delimRE = delim.replace(/([^\w\/#:])/, "\\$1");
