@@ -6,6 +6,7 @@ SRC   := $(wildcard ../lib/*.ts)
 TYPES := $(wildcard ../types/*.d.ts)
 BUILDER_SRC := $(wildcard ./*.ts)
 TEST_SRC := $(wildcard ../test/*.ts)
+BROWSER_SRC := $(wildcard ../browser/*.js)
 
 MJS_DST   := ../dist/sed-lite.mjs
 CJS_DST   := ../dist/sed-lite.cjs
@@ -25,9 +26,12 @@ TEST_CONFIG  := ./rollup-test.config.ts
 # dep — fail the build so it cannot slip in.
 MAX_BYTES := 5000
 
-# The browser test bundle inlines the test sources, the sed-lite source,
-# and the small node:test / node:assert shims. ~5 KB today, capped well
-# above for headroom as more tests are added.
+# The browser test bundle inlines the test sources and the small
+# node:test / node:assert shims. The sed-lite source itself is
+# externalized through `browser/import.js` and supplied at runtime by
+# `dist/sed-lite.min.js` (loaded ahead of the bundle by test.html),
+# so this cap covers test code + shim wiring only. ~15 KB today,
+# capped well above for headroom as more tests are added.
 TEST_MAX_BYTES := 50000
 
 # Documented named exports that must be verified in every bundle.
@@ -73,12 +77,15 @@ $(PKG_DST):
 	@ls -l $@
 	@echo ""
 
-# Browser test bundle. Inlines the test sources, the sed-lite source
-# they import, and the small node:test / node:assert shims (aliased
-# in via rollup-test.config.ts). Loaded by `test/test.html` so the
-# same node:test sources can run unchanged in a browser without
-# mocha or chai.
-$(TEST_DST): $(TEST_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC)
+# Browser test bundle. Inlines the test sources and the small shims
+# (node:test / node:assert), all aliased in via rollup-test.config.ts.
+# The package itself is *not* inlined — `sed-lite` resolves to
+# `browser/import.js`, a 2-line CJS bridge that re-exports the IIFE
+# global set by `dist/sed-lite.min.js` at runtime. Loaded by
+# `test/test.html`, which side-loads `dist/sed-lite.min.js` first.
+# Hence the dependency on $(MINJS_DST): without it, opening the test
+# page after a clean of just the test bundle would 404 on min.js.
+$(TEST_DST): $(TEST_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(BROWSER_SRC) $(MINJS_DST)
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@test "$$(wc -c < $@)" -le $(TEST_MAX_BYTES) || { echo "ERROR: $@ exceeds $(TEST_MAX_BYTES) byte cap" >&2; exit 1; }
