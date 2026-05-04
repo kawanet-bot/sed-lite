@@ -5,6 +5,7 @@ SHELL := bash
 SRC   := $(wildcard ../lib/*.ts)
 TYPES := $(wildcard ../types/*.d.ts)
 BUILDER_SRC := $(wildcard ./*.ts)
+TEST_SRC := $(wildcard ../test/*.ts)
 
 MJS_DST   := ../dist/sed-lite.mjs
 CJS_DST   := ../dist/sed-lite.cjs
@@ -77,7 +78,7 @@ $(PKG_DST):
 # in via rollup-test.config.ts). Loaded by `test/test.html` so the
 # same node:test sources can run unchanged in a browser without
 # mocha or chai.
-$(TEST_DST): $(TEST_CONFIG) $(SRC) $(BUILDER_SRC) $(wildcard ../test/*.test.ts)
+$(TEST_DST): $(TEST_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC)
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@test "$$(wc -c < $@)" -le $(TEST_MAX_BYTES) || { echo "ERROR: $@ exceeds $(TEST_MAX_BYTES) byte cap" >&2; exit 1; }
