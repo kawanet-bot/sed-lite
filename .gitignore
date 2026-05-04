@@ -1,3 +1,5 @@
+*.cjs
+*.mjs
 *.tgz
 *~
 .DS_Store
@@ -6,11 +8,8 @@
 .idea/
 .vscode/
 build/
-# `dist/sed-lite.min.js` is the published browser bundle and is committed
-# to the repository (it ships in the npm package and is mirrored to CDNs).
-# Other Rollup outputs under dist/ are build artifacts and stay ignored.
-dist/sed-lite.cjs
-dist/sed-lite.mjs
+dist/*
+!dist/*.min.js
 lib/**/*.js
 node_modules/
 npm-debug.log*
