@@ -16,6 +16,19 @@ const rollupConfig: RollupOptions = {
         // Expose the default export as the single global value rather
         // than wrapping it in a `{default: ...}` namespace object.
         exports: "default",
+        // Make the bundle dual-purpose: as a browser <script>, the
+        // global `sed` is the function; when require()-d from CJS
+        // (e.g. by browserify-sed), the same file also assigns
+        // `module.exports = sed` so consumers do not need to read
+        // a global. Mirrors the long-standing pre-modernization
+        // shape produced by the hand-rolled IIFE + tsc CJS wrapper.
+        // See kawanet-labs/m4-labs-code#133.
+        //
+        // `footer` (not `outro`) is used so the line lands AFTER the
+        // IIFE assigns its return value to the outer `var sed`.
+        // Rollup's `outro` would be inside the IIFE, where `sed` does
+        // not yet exist.
+        footer: "if (typeof module !== 'undefined') { module.exports = sed }",
     },
 
     plugins: [
