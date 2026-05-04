@@ -26,9 +26,12 @@ TEST_CONFIG  := ./rollup-test.config.ts
 # dep — fail the build so it cannot slip in.
 MAX_BYTES := 5000
 
-# The browser test bundle inlines the test sources, the sed-lite source,
-# and the small node:test / node:assert shims. ~5 KB today, capped well
-# above for headroom as more tests are added.
+# The browser test bundle inlines the test sources and the small
+# node:test / node:assert shims. The sed-lite source itself is
+# externalized through `browser/import.js` and supplied at runtime by
+# `dist/sed-lite.min.js` (loaded ahead of the bundle by test.html),
+# so this cap covers test code + shim wiring only. ~15 KB today,
+# capped well above for headroom as more tests are added.
 TEST_MAX_BYTES := 50000
 
 # Documented named exports that must be verified in every bundle.
