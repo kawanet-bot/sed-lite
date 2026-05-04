@@ -9,6 +9,7 @@ BUILDER_SRC := $(wildcard ./*.ts)
 MJS_DST   := ../dist/sed-lite.mjs
 CJS_DST   := ../dist/sed-lite.cjs
 MINJS_DST := ../dist/sed-lite.min.js
+PKG_DST   := ../dist/package.json
 
 MJS_CONFIG   := ./rollup-mjs.config.ts
 CJS_CONFIG   := ./rollup-cjs.config.ts
@@ -24,7 +25,7 @@ MAX_BYTES := 5000
 # Documented named exports that must be verified in every bundle.
 NAMED_EXPORTS := sed
 
-ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST)
+ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(PKG_DST)
 
 ####
 
@@ -49,6 +50,18 @@ $(MINJS_DST): $(MINJS_CONFIG) $(SRC) $(BUILDER_SRC)
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@test "$$(wc -c < $@)" -le $(MAX_BYTES) || { echo "ERROR: $@ exceeds $(MAX_BYTES) byte cap" >&2; exit 1; }
+	@ls -l $@
+	@echo ""
+
+# dist/package.json marks the dist/ scope as CommonJS so that
+# `dist/sed-lite.min.js` (which is a CJS-compatible IIFE bundle, see
+# rollup-minjs.config.ts) is not interpreted as ESM by Node when
+# require()-d from a parent project that has set "type": "module".
+# The .cjs / .mjs siblings have unambiguous extensions so they are
+# unaffected.
+$(PKG_DST):
+	@mkdir -p $(dir $@)
+	echo '{"type":"commonjs"}' > $@
 	@ls -l $@
 	@echo ""
 

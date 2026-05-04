@@ -39,6 +39,7 @@
     "LICENSE",
     "README.md",
     "browser/import.js",
+    "dist/package.json",
     "dist/sed-lite.cjs",
     "dist/sed-lite.min.js",
     "dist/sed-lite.mjs",
