@@ -3,7 +3,7 @@
 Compile `sed`-style substitution definitions into JavaScript replacer functions.
 
 [![npm](https://img.shields.io/npm/v/sed-lite.svg)](https://www.npmjs.com/package/sed-lite)
-[![Node.js CI](https://github.com/kawanet/sed-lite/workflows/Node.js%20CI/badge.svg?branch=master)](https://github.com/kawanet/sed-lite/actions/)
+[![Node.js CI](https://github.com/kawanet/sed-lite/actions/workflows/nodejs.yml/badge.svg?branch=master)](https://github.com/kawanet/sed-lite/actions/)
 [![gzip size](https://img.badgesize.io/https://cdn.jsdelivr.net/npm/sed-lite/dist/sed-lite.min.js?compression=gzip)](https://cdn.jsdelivr.net/npm/sed-lite/dist/sed-lite.min.js)
 
 ## SYNOPSIS
