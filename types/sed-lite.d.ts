@@ -15,4 +15,7 @@
  *   const fn = sed("s/foo/FOO/g");
  *   fn("foo bar foo"); // "FOO bar FOO"
  */
+
+export {} // external module indicator
+
 export declare const sed: (def: string) => (str: string) => string;
