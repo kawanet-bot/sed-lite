@@ -12,7 +12,7 @@ MJS_DST   := ../dist/sed-lite.mjs
 CJS_DST   := ../dist/sed-lite.cjs
 MINJS_DST := ../dist/sed-lite.min.js
 PKG_DST   := ../dist/package.json
-TEST_DST  := ../test/test.browser.js
+TEST_DST  := ../browser/test/test.browser.js
 
 MJS_CONFIG   := ./rollup-mjs.config.ts
 CJS_CONFIG   := ./rollup-cjs.config.ts
@@ -29,7 +29,7 @@ MAX_BYTES := 5000
 # The browser test bundle inlines the test sources and the small
 # node:test / node:assert shims. The sed-lite source itself is
 # externalized through `browser/import.js` and supplied at runtime by
-# `dist/sed-lite.min.js` (loaded ahead of the bundle by test.html),
+# `dist/sed-lite.min.js` (loaded ahead of the bundle by browser/test/test.html),
 # so this cap covers test code + shim wiring only. ~15 KB today,
 # capped well above for headroom as more tests are added.
 TEST_MAX_BYTES := 50000
@@ -82,7 +82,7 @@ $(PKG_DST):
 # The package itself is *not* inlined — `sed-lite` resolves to
 # `browser/import.js`, a 2-line CJS bridge that re-exports the IIFE
 # global set by `dist/sed-lite.min.js` at runtime. Loaded by
-# `test/test.html`, which side-loads `dist/sed-lite.min.js` first.
+# `browser/test/test.html`, which side-loads `dist/sed-lite.min.js` first.
 # Hence the dependency on $(MINJS_DST): without it, opening the test
 # page after a clean of just the test bundle would 404 on min.js.
 $(TEST_DST): $(TEST_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(BROWSER_SRC) $(MINJS_DST)

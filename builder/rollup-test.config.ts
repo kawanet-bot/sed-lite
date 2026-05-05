@@ -11,7 +11,7 @@ const rollupConfig: RollupOptions = {
     input: "../test/*.test.ts",
 
     output: {
-        file: "../test/test.browser.js",
+        file: "../browser/test/test.browser.js",
         format: "iife",
     },
 
