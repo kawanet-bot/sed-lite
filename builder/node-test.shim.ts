@@ -46,17 +46,42 @@ const root = (): HTMLElement => {
     return el;
 };
 
+// Color names received here (`green` / `red` / `darkorange`) are
+// state-identifier keys at the call sites, not display values: the
+// browser path uses them directly as CSS color names; the Node path
+// maps them to ANSI SGR escapes. Adding a new state means adding the
+// key here AND choosing an ANSI code below.
+const ANSI_BY_COLOR: Record<string, string> = {
+    green: "\x1b[32m",
+    red: "\x1b[31m",
+    darkorange: "\x1b[33m",
+};
+const ANSI_RESET = "\x1b[0m";
+const ANSI_DIM = "\x1b[2m";
+
 const append = (text: string, color: string, suffix?: string): void => {
-    const li = document.createElement("li");
-    li.textContent = text;
-    li.style.color = color;
-    if (suffix) {
-        const span = document.createElement("span");
-        span.textContent = " " + suffix;
-        span.style.color = "gray";
-        li.appendChild(span);
+    if (typeof document !== "undefined") {
+        // Browser path: render into <ul id="results">.
+        const li = document.createElement("li");
+        li.textContent = text;
+        li.style.color = color;
+        if (suffix) {
+            const span = document.createElement("span");
+            span.textContent = " " + suffix;
+            span.style.color = "gray";
+            li.appendChild(span);
+        }
+        root().appendChild(li);
+    } else {
+        // Node path (used by `make test-shim` via shim-loader.ts):
+        // emit one line per result with ANSI-colored text and a dim
+        // suffix. `console.log` (not `error` / `warn`) keeps the
+        // stream consistent with the browser's single results list.
+        const c = ANSI_BY_COLOR[color] || "";
+        const r = c ? ANSI_RESET : "";
+        const tail = suffix ? ` ${ANSI_DIM}${suffix}${ANSI_RESET}` : "";
+        console.log(`${c}${text}${r}${tail}`);
     }
-    root().appendChild(li);
 };
 
 type Body = () => unknown;
@@ -128,6 +153,15 @@ const runHook = async (label: string, fn: Body): Promise<boolean> => {
 // and prevents reporting false pass/fail against uninitialized state.
 // after-hooks still run so resource-cleanup that does not depend on
 // completed setup is still given a chance.
+//
+// State is reset at end of drain so a follow-up registration cycle
+// can schedule a fresh run. The browser bundle hits this code path
+// once (all test files concatenated by rollup share one drain) so
+// the reset is a no-op there. The Node test-shim path imports test
+// files sequentially via run-shim.ts, and each `await import()`
+// boundary triggers its own drain → reset gives each file its own
+// hook/test cycle (per-file isolation in the looser sense — buckets
+// don't accumulate across files).
 const run = async (): Promise<void> => {
     let setupFailed = false;
     for (const fn of befores) {
@@ -141,6 +175,10 @@ const run = async (): Promise<void> => {
         }
     }
     for (const fn of afters) await runHook("after()", fn);
+    befores.length = 0;
+    tests.length = 0;
+    afters.length = 0;
+    scheduled = false;
 };
 
 export const describe = (name: string, fn: () => void): void => {
