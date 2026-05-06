@@ -7,13 +7,13 @@
 // shim drain state cleanly between files.
 
 import {registerHooks} from "node:module";
-import {dirname, resolve as joinPath} from "node:path";
+import {dirname, resolve as resolvePath} from "node:path";
 import {fileURLToPath, pathToFileURL} from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const ALIAS: Record<string, string> = {
-    "node:test": joinPath(here, "node-test.shim.ts"),
-    "node:assert": joinPath(here, "node-assert.shim.ts"),
+    "node:test": resolvePath(here, "node-test.shim.ts"),
+    "node:assert": resolvePath(here, "node-assert.shim.ts"),
 };
 
 registerHooks({
@@ -25,5 +25,5 @@ registerHooks({
 });
 
 for (const f of process.argv.slice(2)) {
-    await import(pathToFileURL(joinPath(process.cwd(), f)).href);
+    await import(pathToFileURL(resolvePath(process.cwd(), f)).href);
 }
