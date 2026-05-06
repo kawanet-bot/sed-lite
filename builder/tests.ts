@@ -23,9 +23,14 @@
 //
 // argv layout from the Makefile target:
 //   process.argv[0] = node
-//   process.argv[1] = .../builder/run-shim.ts (this file)
+//   process.argv[1] = .../builder/tests.ts (this file)
 //   process.argv[2..] = test/*.test.ts (paths relative to cwd, which
 //                       the Makefile sets to the repo root via `cd ..`)
+//
+// Naming: parallels `browser/tests.html` (the browser-side entry
+// that loads `browser/tests/bundled.js`). Both use the basename
+// `tests` for the platform entry; the file extension distinguishes
+// the platform (.html for browser, .ts for Node).
 
 import {registerHooks} from "node:module";
 import {dirname, resolve as joinPath} from "node:path";

@@ -138,14 +138,16 @@ test-ts:
 	cd .. && node --test test/*.test.ts
 
 # Run the same test sources through the browser-side shims. The
-# entry (run-shim.ts) registers the resolve hook (shim-hooks.ts) via
-# module.register() and then `await import()`s every argv test file.
-# This is a regression check for the shims themselves — it does not
-# replace `test-ts` (real node:test runs there) and does not match
-# real node:test semantics (no per-file isolation in the strict
-# sense, etc., per the shim's header comment).
+# entry (tests.ts) registers a same-thread resolve hook via
+# module.registerHooks() that aliases node:test / node:assert /
+# node:assert/strict to the local shim files, then `await import()`s
+# every argv test file. This is a regression check for the shims
+# themselves — it does not replace `test-ts` (real node:test runs
+# there) and does not match real node:test semantics (no per-file
+# isolation in the strict sense, etc., per the shim's header
+# comment). The basename `tests` parallels `browser/tests.html`.
 test-shim:
-	cd .. && node ./builder/run-shim.ts test/*.test.ts
+	cd .. && node ./builder/tests.ts test/*.test.ts
 
 clean:
 	/bin/rm -fr $(ALL)
