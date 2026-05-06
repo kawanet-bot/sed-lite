@@ -144,7 +144,7 @@ smoke-minjs: $(MINJS_DST) $(PKG_DST)
 # Build, run smoke tests, and conditionally run full tests (tsc and node:test).
 test: all smoke $(TYPES)
 	@ [ "$$npm_command" != "install" ] || echo "npm install detected: skipping full tests."
-	@ [ "$$$$npm_command" = "install" ] || $(MAKE) test-ts test-shim
+	@ [ "$$npm_command" = "install" ] || $(MAKE) test-ts test-shim
 
 test-ts:
 	../node_modules/.bin/tsc --noEmit
